@@ -61,21 +61,27 @@ else
 fi
 
 # ── Check frontend dependencies ───────────────────────────────────────────────
+# ── Check frontend dependencies ───────────────────────────────────────────────
 echo "→  Checking frontend dependencies..."
 cd "$FRONTEND_DIR"
 
 if [ ! -d "node_modules" ]; then
   echo "   Installing frontend dependencies..."
   npm install --silent
-  echo "✓  Frontend dependencies installed."
-else
-  echo "✓  Frontend dependencies OK."
 fi
 
-echo ""
-echo "  Starting services..."
-echo "  ────────────────────"
-echo ""
+# Ensure TypeScript deps are installed (fix for Next.js crash)
+if [ -f "tsconfig.json" ]; then
+  if ! npm list typescript >/dev/null 2>&1; then
+    echo "   Installing TypeScript dependencies..."
+    npm install --save-dev typescript @types/react @types/node --silent
+    echo "✓  TypeScript dependencies installed."
+  else
+    echo "✓  TypeScript dependencies OK."
+  fi
+fi
+
+echo "✓  Frontend dependencies ready."
 
 # ── Start backend ─────────────────────────────────────────────────────────────
 cd "$BACKEND_DIR"
